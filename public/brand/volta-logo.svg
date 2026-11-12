@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 96" width="680" height="192" role="img" aria-label="VOLTA - PC, componentes y setup gamer">
+  <rect width="340" height="96" rx="16" fill="#0A0B0F"/>
+  <g transform="translate(20 16)">
+    <rect width="64" height="64" rx="14" fill="#C6FF3D"/>
+    <path d="M37 7 L14 37 H29 L25 57 L50 26 H35 Z" fill="#0A0B0F"/>
+  </g>
+  <text x="100" y="56" font-family="'Chakra Petch','Barlow Condensed','Arial Black',Impact,sans-serif" font-size="42" font-weight="800" letter-spacing="3" fill="#F2F4F8">VOLT<tspan fill="#C6FF3D">A</tspan></text>
+  <text x="102" y="76" font-family="'Manrope',Arial,sans-serif" font-size="10.5" font-weight="600" letter-spacing="2.6" fill="#9AA3B2">PC · COMPONENTES · SETUP</text>
+</svg>

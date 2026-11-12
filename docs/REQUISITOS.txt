@@ -1,0 +1,24 @@
+Que debe tener mi pagina web de venta de componentes para pc, periféricos y pc ensamblados.
+
+-Nadvar con (Inicio, pc gaming, gameroom, monitores, periféricos, contactenos y botón de inicio de sesión / registro), debe ser fijo siempre.
+
+-Hero tipo slider llamativo con 3 secciones *una pc ensambalda, con especificaciones de la pc y botón de compra, *una tajeta grafica en descuento también con botón de compra y uno que nos rediriga a una sección que vamos a tener que es para que el cliente arme su propia pc gamer.
+
+-sección de métodos de pago (addi,Bre-b, Efectivo, Vanti)
+-sección de los mejores pcs ensamblados (busca paginas d ensambaldos de pc y toma las mejores referencias)
+-sección de productos nuevos
+-sección de mejores monitores
+-sección de periféricos mas vendidos
+-sección de armar tu pc gamer online
+-sección de lo mas buscado para gaming y streaming
+-sección de cotización 
+-sección de reseñas
+-sección de información (envios gratis a toda Colombia por compras superiores a 500.000 $ y asesoría personal)
+-botón de whatsapp con animación de salto en el sitio.
+-footer con (soporte, secciones navegables del nadvar, términos y condiciones, configuración de cooker)iconos de redes sociales (Tiktok  Instagram,Kick)
+
+la pagina debe de tener la función de filtro en cada pagina que lo necesite
+
+-carrito de compras
+-vamos a crear la pasarela de pago con wompi sin embargo no vamos a configurarla aun.
+-el usuario debe de poder ver sus pedidos, tener lista de deseos, favoritos, detalles de la cuenta, dirección a la que van a llegar sus pedidos(debe de poder modificar su información como corre, numero de teléfono, contraseña y dirección)
