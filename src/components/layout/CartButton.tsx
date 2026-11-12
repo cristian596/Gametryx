@@ -17,8 +17,9 @@ export function CartButton() {
       <ShoppingCart aria-hidden className="size-[22px]" />
       {count > 0 && (
         <span
+          key={count}
           aria-hidden
-          className="price absolute top-0.5 right-0 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-on-primary"
+          className="price absolute animate-badge-pop top-0.5 right-0 grid h-5 min-w-5 place-items-center rounded-full bg-primary px-1 text-[11px] font-bold text-on-primary"
         >
           {count > 99 ? "99+" : count}
         </span>

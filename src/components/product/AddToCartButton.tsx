@@ -47,18 +47,20 @@ export function AddToCartButton({
           add(productId, 1, stock);
           setAdded(true);
         }}
-        aria-label={`Agregar ${productName} al carrito`}
       >
+        {/* El nombre accesible empieza con el texto visible (WCAG 2.5.3) y suma el producto en texto oculto */}
         {added ? (
           "Agregado"
         ) : compact ? (
-          <>
+          <span>
             {/* En tarjetas angostas (2 columnas en celular) solo cabe "Agregar" */}
-            <span className="sm:hidden">Agregar</span>
-            <span className="hidden sm:inline">Agregar al carrito</span>
-          </>
+            Agregar<span className="hidden sm:inline"> al carrito</span>
+            <span className="sr-only">: {productName}</span>
+          </span>
         ) : (
-          "Agregar al carrito"
+          <span>
+            Agregar al carrito<span className="sr-only">: {productName}</span>
+          </span>
         )}
       </Button>
       <span role="status" aria-live="polite" className="sr-only">

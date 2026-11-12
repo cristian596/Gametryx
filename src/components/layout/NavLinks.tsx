@@ -13,7 +13,7 @@ function isActive(pathname: string, href: string) {
 }
 
 const linkBase =
-  "relative inline-flex h-11 items-center gap-1 rounded-sm px-3 text-[15px] font-medium transition-colors duration-(--duration-fast) hover:text-text";
+  "relative inline-flex h-11 items-center gap-1 whitespace-nowrap rounded-sm px-2.5 text-[15px] font-medium xl:px-3 transition-colors duration-(--duration-fast) hover:text-text";
 
 /** Enlaces del navbar en escritorio, con submenús de Gameroom y PC Gaming. */
 export function DesktopNavLinks() {
@@ -125,7 +125,7 @@ function NavDropdown({ item, active }: { item: NavItem; active: boolean }) {
         hidden={!open}
         className="absolute top-full left-0 z-50 pt-2"
       >
-        <ul className="w-72 animate-rise-in rounded-md bg-surface-2 p-2 shadow-float">
+        <ul className="w-72 origin-top-left animate-pop-in rounded-md bg-surface-2 p-2 shadow-float">
           {item.children!.map((child) => (
             <li key={child.href}>
               <Link

@@ -49,7 +49,15 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es-CO" className={`${chakra.variable} ${manrope.variable} ${jetbrains.variable} antialiased`}>
+    <html
+      lang="es-CO"
+      className={`${chakra.variable} ${manrope.variable} ${jetbrains.variable} antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        {/* Marca que hay JS antes de pintar: las animaciones de entrada solo ocultan contenido si esto corrió */}
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#contenido"

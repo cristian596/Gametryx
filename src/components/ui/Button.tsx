@@ -3,7 +3,8 @@ import type { ComponentProps, ReactNode } from "react";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+/** inverse / inverse-ghost: para usar sobre campos verdes (bg-primary). */
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "inverse" | "inverse-ghost";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
@@ -16,6 +17,8 @@ const variants: Record<ButtonVariant, string> = {
   secondary: "bg-surface-2 text-text hover:bg-surface-3",
   ghost: "bg-transparent text-text hover:bg-surface-2",
   danger: "bg-danger text-on-primary hover:brightness-110",
+  inverse: "bg-on-primary text-primary hover:bg-surface active:bg-surface-2",
+  "inverse-ghost": "bg-transparent text-on-primary hover:bg-on-primary/10 active:bg-on-primary/15",
 };
 
 const sizes: Record<ButtonSize, string> = {

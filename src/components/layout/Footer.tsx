@@ -1,6 +1,6 @@
 import { cacheLife } from "next/cache";
 import Link from "next/link";
-import { LogoMark } from "@/components/brand/Logo";
+
 import { InstagramIcon, KickIcon, TikTokIcon, WhatsAppIcon } from "@/components/brand/SocialIcons";
 import { legalLinks, mainNav, supportLinks } from "@/config/navigation";
 import { site, whatsappUrl } from "@/config/site";
@@ -94,7 +94,7 @@ export async function Footer() {
               </li>
             ))}
             <li>
-              <CookieSettingsButton className={`${linkClass} cursor-pointer`} />
+              <CookieSettingsButton className={`${linkClass} cursor-pointer text-left`} />
             </li>
           </ul>
         </nav>
@@ -103,13 +103,25 @@ export async function Footer() {
       {/* Cierre: la marca vuelve a ancho completo */}
       <div className="container-page">
         <div className="flex flex-col gap-6 pb-8 md:flex-row md:items-end md:justify-between">
-          <p
-            aria-hidden
-            className="flex items-center gap-4 font-display text-[clamp(4rem,17vw,15rem)] leading-[0.8] font-bold tracking-[0.04em] text-surface-3 select-none"
-          >
-            <LogoMark className="size-[0.72em] opacity-90" />
-            VOLTA
-          </p>
+          {/* Decorativo y en SVG: es una imagen de marca, no texto que se deba leer */}
+          <svg aria-hidden viewBox="0 0 1000 200" className="w-full select-none md:w-[72%]">
+            <g transform="scale(3.125)">
+              <rect width="64" height="64" rx="14" fill="var(--color-primary)" />
+              <path d="M37 7 L14 37 H29 L25 57 L50 26 H35 Z" fill="var(--color-on-primary)" />
+            </g>
+            <text
+              x="240"
+              y="178"
+              textLength="755"
+              lengthAdjust="spacingAndGlyphs"
+              fontSize="232"
+              fontWeight="700"
+              fill="var(--color-surface-3)"
+              style={{ fontFamily: "var(--font-chakra)" }}
+            >
+              VOLTA
+            </text>
+          </svg>
           <ul className="flex gap-2 md:pb-3" aria-label="Redes sociales">
             {socials.map(({ label, href, Icon }) => (
               <li key={label}>
