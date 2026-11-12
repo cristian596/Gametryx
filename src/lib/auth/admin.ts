@@ -1,5 +1,6 @@
 import "server-only";
 import { notFound, redirect } from "next/navigation";
+import { connection } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
@@ -9,6 +10,8 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  * Devuelve un cliente con la sesión del admin: la RLS permite escribir el catálogo solo a admins.
  */
 export async function requireAdmin(nextPath = "/admin/productos") {
+  // Siempre por petición: el cliente de Supabase usa Date.now() y no puede prerenderizarse
+  await connection();
   const supabase = await createSupabaseServerClient();
   // getUser consulta a Supabase: no confía solo en la cookie
   const {
