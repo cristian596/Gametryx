@@ -24,11 +24,15 @@ type ProductRow = {
   benchmarks: { juego: string; resolucion: FpsEstimate["resolucion"]; fps_estimado: number; orden: number }[];
 };
 
+/**
+ * Los embebidos se nombran por la columna de la llave foránea (categoria_id, parent_id):
+ * en una relación consigo misma, `parent:categories(...)` devuelve los HIJOS (un arreglo), no el padre.
+ */
 const SELECT = `
   id, slug, nombre, descripcion, tipo, precio_cop, precio_anterior_cop, stock, specs, tags,
   es_nuevo, es_destacado, mas_vendido,
-  category:categories!products_categoria_id_fkey ( slug, parent:categories ( slug ) ),
-  brand:brands ( nombre ),
+  category:categoria_id ( slug, parent:parent_id ( slug ) ),
+  brand:marca_id ( nombre ),
   images:product_images ( url, alt, orden ),
   benchmarks:pc_benchmarks ( juego, resolucion, fps_estimado, orden )
 `;
@@ -37,8 +41,10 @@ const SELECT = `
 export function mapProductRow(row: ProductRow): Product | null {
   const cat = row.category;
   if (!cat) return null;
-  // Producto en subcategoría (sillas) → categoría = padre (gameroom); en raíz (monitores) → ella misma
-  const root = (cat.parent?.slug ?? cat.slug) as CategorySlug;
+  // Producto en subcategoría (sillas) → categoría = padre (gameroom); en raíz (monitores) → ella misma.
+  // Si llegara un arreglo (relación inversa), se descarta en vez de tomarlo por padre.
+  const parent = Array.isArray(cat.parent) ? null : cat.parent;
+  const root = (parent?.slug ?? cat.slug) as CategorySlug;
   if (!ROOT_SLUGS.includes(root)) return null;
 
   return {

@@ -65,6 +65,11 @@ describe("mapProductRow", () => {
     expect(p?.categoria).toBe("monitores");
   });
 
+  it("no confunde una lista de hijos con el padre", () => {
+    const row = { ...base, category: { slug: "sillas", parent: [] as unknown as null } };
+    expect(mapProductRow(row)).toBeNull();
+  });
+
   it("descarta categorías desconocidas", () => {
     expect(mapProductRow({ ...base, category: { slug: "otra", parent: null } })).toBeNull();
     expect(mapProductRow({ ...base, category: null })).toBeNull();
