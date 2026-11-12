@@ -163,10 +163,102 @@ function BuilderSlide() {
   );
 }
 
+/**
+ * Diapositiva de reserva con contenido estático: se usa si el catálogo no devuelve el producto
+ * (cambió el slug, está inactivo o la BD falló), para que el hero nunca quede vacío.
+ */
+function FallbackSlide({
+  title,
+  text,
+  href,
+  cta,
+  image,
+  priority,
+}: {
+  title: string;
+  text: string;
+  href: string;
+  cta: string;
+  image: string;
+  priority?: boolean;
+}) {
+  return (
+    <div className={slideGrid}>
+      <div className={textCol}>
+        <div>
+          <h2 className={headline}>{title}</h2>
+          <p className="mt-4 max-w-md text-lg leading-relaxed">{text}</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <LinkButton href={href} size="lg">
+            {cta}
+          </LinkButton>
+          <LinkButton href="/cotizacion" variant="secondary" size="lg">
+            Cotizar con un asesor
+          </LinkButton>
+        </div>
+      </div>
+      <div className="relative order-first aspect-[4/3] bg-surface-2 md:order-none md:col-span-6 md:aspect-auto lg:col-span-7">
+        <Image
+          src={image}
+          alt=""
+          fill
+          priority={priority}
+          unoptimized
+          sizes="(min-width: 1024px) 720px, (min-width: 768px) 50vw, 100vw"
+          className="object-contain"
+        />
+      </div>
+    </div>
+  );
+}
+
 export function HeroSlides({ pc, gpu }: { pc: Product | null; gpu: Product | null }) {
   const slides: HeroSlide[] = [];
-  if (pc) slides.push({ id: "pc", label: "PC Surge 1440p", title: "PC VOLTA Surge", tone: "dark", content: <PcSlide pc={pc} priority /> });
-  if (gpu) slides.push({ id: "gpu", label: "RTX 5070 en oferta", title: "Tarjeta gráfica RTX 5070 en descuento", tone: "dark", content: <GpuSlide gpu={gpu} /> });
+
+  slides.push(
+    pc
+      ? { id: "pc", label: "PC Surge 1440p", title: "PC VOLTA Surge", tone: "dark", content: <PcSlide pc={pc} priority /> }
+      : {
+          id: "pc",
+          label: "PC armados",
+          title: "PC gamer armados",
+          tone: "dark",
+          content: (
+            <FallbackSlide
+              title="PC gamer armados"
+              text="Equipos para 1080p, 2K y 4K, listos para conectar y jugar."
+              href="/pc-gaming?tipo=pc-armados"
+              cta="Ver PC armados"
+              image="/placeholders/pc.svg"
+              priority
+            />
+          ),
+        },
+  );
+
+  // La diapositiva de la GPU solo tiene sentido si existe y tiene descuento real
+  const gpuOnSale = gpu && discountPercent(gpu.precioCop, gpu.precioAnteriorCop) > 0;
+  slides.push(
+    gpuOnSale
+      ? { id: "gpu", label: "RTX 5070 en oferta", title: "Tarjeta gráfica RTX 5070 en descuento", tone: "dark", content: <GpuSlide gpu={gpu} /> }
+      : {
+          id: "gpu",
+          label: "Componentes",
+          title: "Componentes para tu PC",
+          tone: "dark",
+          content: (
+            <FallbackSlide
+              title="Mejora tu PC"
+              text="Tarjetas gráficas, procesadores, memoria y almacenamiento con asesoría para elegir."
+              href="/pc-gaming?tipo=componentes"
+              cta="Ver componentes"
+              image="/placeholders/gpu.svg"
+            />
+          ),
+        },
+  );
+
   slides.push({ id: "armar", label: "Arma tu PC", title: "Arma tu PC pieza por pieza", tone: "primary", content: <BuilderSlide /> });
   return <HeroSlider slides={slides} />;
 }

@@ -39,7 +39,13 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
   const [cycle, setCycle] = useState(0);
 
   useEffect(() => {
-    if (!emblaApi) return;
+    // Sin API o sin diapositivas montadas, el plugin no tiene a qué aplicar autoplay
+    if (!emblaApi || emblaApi.slideNodes().length === 0) return;
+    // Con 1 sola posición, Embla Autoplay no inicializa su `delay` y play() lanza
+    // "Cannot read properties of undefined (reading '0')": no hay nada que rotar.
+    if (emblaApi.scrollSnapList().length <= 1) return;
+    // Se usa la instancia viva que registró Embla (en Strict Mode el carrusel se destruye y se vuelve a crear)
+    const autoplayPlugin = emblaApi.plugins().autoplay;
     const onSelect = () => {
       setSelected(emblaApi.selectedScrollSnap());
       setCycle((c) => c + 1);
@@ -52,30 +58,33 @@ export function HeroSlider({ slides }: { slides: HeroSlide[] }) {
     emblaApi.on("select", onSelect);
     emblaApi.on("autoplay:play", onPlay);
     emblaApi.on("autoplay:stop", onStop);
-    if (!prefersReducedMotion()) autoplay.play();
+    if (!prefersReducedMotion()) autoplayPlugin?.play();
     return () => {
       emblaApi.off("select", onSelect);
       emblaApi.off("autoplay:play", onPlay);
       emblaApi.off("autoplay:stop", onStop);
+      // Evita temporizadores colgados cuando el efecto se limpia (Strict Mode, cambio de slides)
+      autoplayPlugin?.stop();
     };
-  }, [emblaApi, autoplay]);
+  }, [emblaApi]);
 
   // Con stopOnMouseEnter, Embla reanuda al salir del mouse; si el usuario pausó, se respeta
   useEffect(() => {
-    if (userPaused && playing) autoplay.stop();
-  }, [userPaused, playing, autoplay]);
+    if (userPaused && playing) emblaApi?.plugins().autoplay?.stop();
+  }, [userPaused, playing, emblaApi]);
 
   const goTo = useCallback((i: number) => emblaApi?.scrollTo(i), [emblaApi]);
   const prev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
   const next = useCallback(() => emblaApi?.scrollNext(), [emblaApi]);
 
   function togglePlay() {
+    const autoplayPlugin = emblaApi?.plugins().autoplay;
     if (playing) {
       setUserPaused(true);
-      autoplay.stop();
+      autoplayPlugin?.stop();
     } else {
       setUserPaused(false);
-      autoplay.play();
+      autoplayPlugin?.play();
     }
   }
 
