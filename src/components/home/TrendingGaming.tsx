@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ProductRow } from "@/components/product/ProductRow";
 import { popularSearches } from "@/lib/home";
@@ -28,6 +29,15 @@ export function TrendingGaming({ products }: { products: Product[] }) {
               </li>
             ))}
           </ul>
+          {/* Foto de ambiente (no es un producto VOLTA). Ver public/images/CREDITOS.md */}
+          <Image
+            src="/images/streaming.jpg"
+            alt="Micrófono de streaming frente a un monitor encendido"
+            width={1600}
+            height={1068}
+            sizes="(min-width: 1024px) 400px, 100vw"
+            className="mt-6 aspect-[4/3] w-full rounded-lg object-cover object-[55%_60%]"
+          />
         </Reveal>
         {products.length > 0 && (
           <Reveal as="ul" className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:col-span-8">

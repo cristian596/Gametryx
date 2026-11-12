@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { site, whatsappUrl } from "@/config/site";
 import { formatCOP } from "@/lib/format";
@@ -29,6 +30,15 @@ export function QuoteSection() {
               </div>
             ))}
           </dl>
+          {/* Foto de ambiente (no es un producto VOLTA). Ver public/images/CREDITOS.md */}
+          <Image
+            src="/images/armado.jpg"
+            alt="Manos abriendo el panel de vidrio de un PC de escritorio"
+            width={1600}
+            height={1201}
+            sizes="(min-width: 1024px) 480px, 100vw"
+            className="mt-8 aspect-[4/3] w-full rounded-lg object-cover object-[35%_45%]"
+          />
         </Reveal>
         <Reveal className="lg:col-span-7">
           <QuoteForm />
@@ -96,7 +106,18 @@ export function InfoStrip() {
       <h2 id="info-title" className="sr-only">
         Envíos y asesoría
       </h2>
-      <Reveal as="ul" className="container-page grid gap-4 md:grid-cols-2">
+      <Reveal className="container-page grid grid-cols-1 gap-4 lg:grid-cols-12">
+        {/* Foto de ambiente (no es un producto VOLTA). Ver public/images/CREDITOS.md */}
+        <div data-reveal-item className="relative min-h-72 overflow-hidden rounded-lg lg:col-span-5">
+          <Image
+            src="/images/hero-pc.jpg"
+            alt="PC gamer con iluminación azul sobre un escritorio"
+            fill
+            sizes="(min-width: 1024px) 500px, 100vw"
+            className="object-cover object-[80%_62%]"
+          />
+        </div>
+        <ul className="grid grid-cols-1 gap-4 lg:col-span-7">
         <li data-reveal-item className="flex flex-col gap-4 rounded-lg bg-surface p-6 sm:p-10">
           <h3 className="text-[26px] leading-tight font-bold md:text-[32px]">Envío gratis a toda Colombia</h3>
           <p className="text-base leading-relaxed">
@@ -121,6 +142,7 @@ export function InfoStrip() {
             Escribir al {site.whatsappDisplay}
           </a>
         </li>
+        </ul>
       </Reveal>
     </section>
   );
