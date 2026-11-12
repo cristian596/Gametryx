@@ -1,9 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Chakra_Petch, JetBrains_Mono, Manrope } from "next/font/google";
-import { CookieBanner } from "@/components/layout/CookieBanner";
-import { Footer } from "@/components/layout/Footer";
-import { Navbar } from "@/components/layout/Navbar";
-import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { site } from "@/config/site";
 import "./globals.css";
 
@@ -65,13 +61,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Saltar al contenido
         </a>
-        <Navbar />
-        <main id="contenido" tabIndex={-1} className="flex flex-1 flex-col outline-none">
-          {children}
-        </main>
-        <Footer />
-        <WhatsAppButton />
-        <CookieBanner />
+        {/* Navbar, footer, WhatsApp y cookies viven en app/(store)/layout.tsx; el admin tiene el suyo */}
+        {children}
       </body>
     </html>
   );

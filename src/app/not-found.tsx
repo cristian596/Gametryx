@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { StoreShell } from "@/components/layout/StoreShell";
 import { LinkButton } from "@/components/ui/Button";
 import { mainNav } from "@/config/navigation";
 import { whatsappUrl } from "@/config/site";
@@ -7,7 +8,9 @@ import { whatsappUrl } from "@/config/site";
 export const metadata: Metadata = { title: "Página no encontrada", robots: { index: false } };
 
 export default function NotFound() {
+  // Se muestra fuera del grupo (store): incluye el marco de la tienda
   return (
+    <StoreShell>
     <div className="container-page flex flex-1 flex-col justify-center py-20 md:py-32">
       <p aria-hidden className="price text-[clamp(5rem,20vw,12rem)] leading-none font-medium text-surface-3">
         404
@@ -43,5 +46,6 @@ export default function NotFound() {
         </LinkButton>
       </div>
     </div>
+    </StoreShell>
   );
 }
