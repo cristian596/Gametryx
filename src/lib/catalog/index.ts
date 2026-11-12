@@ -1,55 +1,49 @@
 /**
  * Capa de repositorio del catálogo.
- * Hoy lee del catálogo de ejemplo; en la Fase 3a se añade la implementación con Supabase
- * y este archivo elige cuál usar según las variables de entorno.
+ * - Con NEXT_PUBLIC_SUPABASE_URL y la clave publicable → lee de Supabase.
+ * - Sin ellas → usa el catálogo de ejemplo (desarrollo sin BD).
+ * El catálogo completo se guarda en caché con la etiqueta "catalog"; el admin la invalida al guardar (Fase 4).
  */
+import { cacheLife, cacheTag } from "next/cache";
 import { mockProducts } from "@/data/catalog.mock";
-import type { CategorySlug, Product } from "@/types/catalog";
+import { isSupabaseConfigured } from "@/lib/supabase/env";
+import type { Product } from "@/types/catalog";
+import { applyQuery, type ProductQuery } from "./query";
+import { fetchSupabaseProducts } from "./supabase";
 
-export type ProductQuery = {
-  categoria?: CategorySlug;
-  subcategoria?: string;
-  soloDestacados?: boolean;
-  soloNuevos?: boolean;
-  orden?: "relevancia" | "mas-vendidos" | "precio-asc" | "precio-desc" | "nuevos";
-  limite?: number;
-};
+export type { ProductQuery } from "./query";
+
+export const CATALOG_TAG = "catalog";
+
+let warned = false;
+
+async function loadCatalog(): Promise<Product[]> {
+  "use cache";
+  cacheTag(CATALOG_TAG);
+  // Respaldo si el admin no invalida: como máximo unos minutos desactualizado
+  cacheLife("minutes");
+
+  if (isSupabaseConfigured) return fetchSupabaseProducts();
+
+  if (process.env.NODE_ENV === "production" && !warned) {
+    warned = true;
+    console.warn("[catalog] Supabase no está configurado: se muestra el catálogo de EJEMPLO.");
+  }
+  return mockProducts;
+}
 
 export interface CatalogRepository {
   getProducts(query?: ProductQuery): Promise<Product[]>;
   getProductBySlug(slug: string): Promise<Product | null>;
 }
 
-const mockRepository: CatalogRepository = {
-  async getProducts(query = {}) {
-    let list = mockProducts.slice();
-    if (query.categoria) list = list.filter((p) => p.categoria === query.categoria);
-    if (query.subcategoria) list = list.filter((p) => p.subcategoria === query.subcategoria);
-    if (query.soloDestacados) list = list.filter((p) => p.esDestacado);
-    if (query.soloNuevos) list = list.filter((p) => p.esNuevo);
-
-    switch (query.orden) {
-      case "mas-vendidos":
-        list.sort((a, b) => b.masVendido - a.masVendido);
-        break;
-      case "precio-asc":
-        list.sort((a, b) => a.precioCop - b.precioCop);
-        break;
-      case "precio-desc":
-        list.sort((a, b) => b.precioCop - a.precioCop);
-        break;
-      case "nuevos":
-        list.sort((a, b) => Number(b.esNuevo) - Number(a.esNuevo));
-        break;
-      default:
-        // relevancia: con stock primero, luego destacados
-        list.sort((a, b) => Number(b.stock > 0) - Number(a.stock > 0) || Number(b.esDestacado) - Number(a.esDestacado));
-    }
-    return query.limite ? list.slice(0, query.limite) : list;
+export const catalog: CatalogRepository = {
+  async getProducts(query) {
+    return applyQuery(await loadCatalog(), query);
   },
   async getProductBySlug(slug) {
-    return mockProducts.find((p) => p.slug === slug) ?? null;
+    return (await loadCatalog()).find((p) => p.slug === slug) ?? null;
   },
 };
 
-export const catalog: CatalogRepository = mockRepository;
+export const catalogSource = isSupabaseConfigured ? "supabase" : "mock";
