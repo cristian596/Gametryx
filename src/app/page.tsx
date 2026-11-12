@@ -6,7 +6,9 @@ import { PaymentMethods } from "@/components/home/PaymentMethods";
 import { NewProducts, TopMonitors, TopPeripherals } from "@/components/home/ProductSections";
 import { TrendingGaming } from "@/components/home/TrendingGaming";
 import { site } from "@/config/site";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getHomeData } from "@/lib/home";
+import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 
 /** Home: secciones en el orden de REQUISITOS.txt. */
 export default async function HomePage() {
@@ -14,6 +16,8 @@ export default async function HomePage() {
 
   return (
     <>
+      <JsonLd data={organizationJsonLd()} />
+      <JsonLd data={websiteJsonLd()} />
       <h1 className="sr-only">
         {site.name}: {site.tagline}
       </h1>
