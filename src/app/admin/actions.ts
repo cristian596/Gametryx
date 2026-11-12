@@ -5,7 +5,8 @@ import { z } from "zod";
 import { allowRequest, clientKey } from "@/lib/auth/rate-limit";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export type LoginState = { error?: string; email?: string };
+/** No se devuelve el correo en el estado: Next lo escribe en los logs de desarrollo. El campo conserva lo escrito. */
+export type LoginState = { error?: string };
 
 const loginSchema = z.object({
   email: z.email("Escribe un correo válido."),
@@ -24,12 +25,11 @@ export async function adminSignIn(_prev: LoginState, formData: FormData): Promis
     password: formData.get("password"),
     next: formData.get("next") ?? undefined,
   });
-  const email = String(formData.get("email") ?? "");
-  if (!parsed.success) return { error: parsed.error.issues[0]?.message, email };
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message };
 
   // 5 intentos cada 15 minutos por IP + correo
   if (!(await allowRequest(await clientKey("login", parsed.data.email), 5, 900))) {
-    return { error: "Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.", email };
+    return { error: "Demasiados intentos. Espera 15 minutos e inténtalo de nuevo." };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -38,7 +38,7 @@ export async function adminSignIn(_prev: LoginState, formData: FormData): Promis
     password: parsed.data.password,
   });
   // Mismo mensaje para correo o contraseña incorrectos: no revela qué cuentas existen
-  if (error) return { error: "El correo o la contraseña no coinciden.", email };
+  if (error) return { error: "El correo o la contraseña no coinciden." };
 
   redirect(safeNext(parsed.data.next));
 }
