@@ -1,0 +1,456 @@
+/**
+ * ⚠️ CATÁLOGO DE EJEMPLO — no es inventario real.
+ *
+ * - Precios, stock, ventas y FPS son valores de ejemplo para ver el diseño con datos.
+ * - Los chips (RTX 5070, Ryzen 7 7800X3D…) son modelos reales del mercado; las marcas de
+ *   monitores, periféricos y gameroom (Kairo, Vektor, Nórdika, Halcón, Oriel) son inventadas.
+ * - Se reemplaza por Supabase en la Fase 3a y luego por productos reales desde el panel admin.
+ */
+import type { FpsEstimate, Product, ProductType, CategorySlug, SpecValue } from "@/types/catalog";
+
+type Seed = {
+  slug: string;
+  nombre: string;
+  descripcion: string;
+  tipo: ProductType;
+  categoria: CategorySlug;
+  subcategoria: string;
+  marca: string;
+  precio: number;
+  anterior?: number;
+  stock: number;
+  specs: Record<string, SpecValue>;
+  tags?: string[];
+  nuevo?: boolean;
+  destacado?: boolean;
+  vendidos?: number;
+  imagen: string;
+  fps?: FpsEstimate[];
+};
+
+function make(seed: Seed, index: number): Product {
+  return {
+    id: `p${String(index + 1).padStart(3, "0")}`,
+    slug: seed.slug,
+    nombre: seed.nombre,
+    descripcion: seed.descripcion,
+    tipo: seed.tipo,
+    categoria: seed.categoria,
+    subcategoria: seed.subcategoria,
+    marca: seed.marca,
+    precioCop: seed.precio,
+    precioAnteriorCop: seed.anterior ?? null,
+    stock: seed.stock,
+    specs: seed.specs,
+    tags: seed.tags ?? [],
+    esNuevo: seed.nuevo ?? false,
+    esDestacado: seed.destacado ?? false,
+    masVendido: seed.vendidos ?? 0,
+    imagenes: [{ url: `/placeholders/${seed.imagen}.svg`, alt: seed.nombre }],
+    fps: seed.fps,
+  };
+}
+
+const seeds: Seed[] = [
+  // ───────────── PC armados ─────────────
+  {
+    slug: "pc-volta-pulse-1080p",
+    nombre: "PC VOLTA Pulse 1080p · Core i5-12400F · RTX 4060",
+    descripcion: "El punto de entrada para jugar en Full HD a más de 100 FPS en los títulos competitivos.",
+    tipo: "pc_ensamblado", categoria: "pc-gaming", subcategoria: "pc-armados", marca: "VOLTA",
+    precio: 3_690_000, anterior: 3_990_000, stock: 7, vendidos: 64, destacado: true,
+    imagen: "pc",
+    specs: { cpu: "Intel Core i5-12400F", gpu: "NVIDIA GeForce RTX 4060 8 GB", ram: "16 GB DDR4 3200", almacenamiento: "SSD NVMe 1 TB", fuente: "650 W 80+ Bronze", resolucion_objetivo: "1080p" },
+    tags: ["gaming", "1080p"],
+    fps: [
+      { juego: "Valorant", resolucion: "1080p", fps: 280 },
+      { juego: "Fortnite (rendimiento)", resolucion: "1080p", fps: 165 },
+      { juego: "Cyberpunk 2077 (alto + DLSS)", resolucion: "1080p", fps: 78 },
+    ],
+  },
+  {
+    slug: "pc-volta-spark-1080p",
+    nombre: "PC VOLTA Spark 1080p · Ryzen 5 7600 · RTX 4060",
+    descripcion: "Plataforma AM5 con DDR5 para jugar hoy en Full HD y mejorar mañana sin cambiar de board.",
+    tipo: "pc_ensamblado", categoria: "pc-gaming", subcategoria: "pc-armados", marca: "VOLTA",
+    precio: 4_190_000, stock: 5, vendidos: 41, nuevo: true,
+    imagen: "pc",
+    specs: { cpu: "AMD Ryzen 5 7600", gpu: "NVIDIA GeForce RTX 4060 8 GB", ram: "16 GB DDR5 6000", almacenamiento: "SSD NVMe 1 TB", fuente: "650 W 80+ Bronze", resolucion_objetivo: "1080p" },
+    tags: ["gaming", "1080p", "am5"],
+    fps: [
+      { juego: "Valorant", resolucion: "1080p", fps: 320 },
+      { juego: "Fortnite (rendimiento)", resolucion: "1080p", fps: 180 },
+      { juego: "Cyberpunk 2077 (alto + DLSS)", resolucion: "1080p", fps: 82 },
+    ],
+  },
+  {
+    slug: "pc-volta-surge-1440p",
+    nombre: "PC VOLTA Surge 1440p · Ryzen 7 7700 · RTX 5070",
+    descripcion: "Nuestro equilibrio favorito: 2K a alta tasa de refresco con margen para streaming.",
+    tipo: "pc_ensamblado", categoria: "pc-gaming", subcategoria: "pc-armados", marca: "VOLTA",
+    precio: 7_490_000, anterior: 7_990_000, stock: 4, vendidos: 52, destacado: true,
+    imagen: "pc",
+    specs: { cpu: "AMD Ryzen 7 7700", gpu: "NVIDIA GeForce RTX 5070 12 GB", ram: "32 GB DDR5 6000", almacenamiento: "SSD NVMe 2 TB", fuente: "750 W 80+ Gold", resolucion_objetivo: "1440p" },
+    tags: ["gaming", "1440p", "streaming"],
+    fps: [
+      { juego: "Valorant", resolucion: "1440p", fps: 360 },
+      { juego: "Fortnite (épico + DLSS)", resolucion: "1440p", fps: 120 },
+      { juego: "Cyberpunk 2077 (ultra + DLSS)", resolucion: "1440p", fps: 95 },
+    ],
+  },
+  {
+    slug: "pc-volta-arc-1440p",
+    nombre: "PC VOLTA Arc 1440p · Core i5-14600KF · Radeon RX 9070",
+    descripcion: "16 GB de memoria de video para texturas altas en 2K durante años.",
+    tipo: "pc_ensamblado", categoria: "pc-gaming", subcategoria: "pc-armados", marca: "VOLTA",
+    precio: 7_890_000, stock: 3, vendidos: 19, nuevo: true,
+    imagen: "pc",
+    specs: { cpu: "Intel Core i5-14600KF", gpu: "AMD Radeon RX 9070 16 GB", ram: "32 GB DDR5 6000", almacenamiento: "SSD NVMe 2 TB", fuente: "750 W 80+ Gold", resolucion_objetivo: "1440p" },
+    tags: ["gaming", "1440p"],
+    fps: [
+      { juego: "Valorant", resolucion: "1440p", fps: 340 },
+      { juego: "Fortnite (épico + FSR)", resolucion: "1440p", fps: 115 },
+      { juego: "Cyberpunk 2077 (ultra + FSR)", resolucion: "1440p", fps: 88 },
+    ],
+  },
+  {
+    slug: "pc-volta-storm-4k",
+    nombre: "PC VOLTA Storm 4K · Ryzen 7 9800X3D · RTX 5080",
+    descripcion: "Para jugar en 4K con todo en ultra. El procesador gamer más rápido con la gráfica que le hace honor.",
+    tipo: "pc_ensamblado", categoria: "pc-gaming", subcategoria: "pc-armados", marca: "VOLTA",
+    precio: 13_990_000, stock: 2, vendidos: 11, destacado: true,
+    imagen: "pc",
+    specs: { cpu: "AMD Ryzen 7 9800X3D", gpu: "NVIDIA GeForce RTX 5080 16 GB", ram: "32 GB DDR5 6000 CL30", almacenamiento: "SSD NVMe 2 TB Gen4", fuente: "1000 W 80+ Gold", resolucion_objetivo: "4K" },
+    tags: ["gaming", "4k"],
+    fps: [
+      { juego: "Valorant", resolucion: "4K", fps: 300 },
+      { juego: "Fortnite (épico + DLSS)", resolucion: "4K", fps: 110 },
+      { juego: "Cyberpunk 2077 (ultra + DLSS)", resolucion: "4K", fps: 85 },
+    ],
+  },
+  {
+    slug: "pc-volta-studio-streaming",
+    nombre: "PC VOLTA Studio · Ryzen 9 9900X · RTX 5070 Ti",
+    descripcion: "12 núcleos para jugar, transmitir y editar a la vez sin que se caigan los FPS.",
+    tipo: "pc_ensamblado", categoria: "pc-gaming", subcategoria: "pc-armados", marca: "VOLTA",
+    precio: 10_490_000, stock: 0, vendidos: 23,
+    imagen: "pc",
+    specs: { cpu: "AMD Ryzen 9 9900X", gpu: "NVIDIA GeForce RTX 5070 Ti 16 GB", ram: "64 GB DDR5 6000", almacenamiento: "SSD NVMe 2 TB + 2 TB", fuente: "850 W 80+ Gold", resolucion_objetivo: "1440p" },
+    tags: ["streaming", "1440p", "edicion"],
+    fps: [
+      { juego: "Valorant", resolucion: "1440p", fps: 380 },
+      { juego: "Fortnite (épico + DLSS)", resolucion: "1440p", fps: 140 },
+      { juego: "Cyberpunk 2077 (ultra + DLSS)", resolucion: "1440p", fps: 110 },
+    ],
+  },
+
+  // ───────────── Componentes ─────────────
+  {
+    slug: "rtx-5070-12gb",
+    nombre: "Tarjeta gráfica NVIDIA GeForce RTX 5070 12 GB GDDR7",
+    descripcion: "DLSS 4 y generación de cuadros para jugar en 2K a alta tasa de refresco.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "NVIDIA",
+    precio: 3_390_000, anterior: 3_990_000, stock: 6, vendidos: 47, destacado: true,
+    imagen: "gpu",
+    specs: { componente: "Tarjeta gráfica", vram_gb: 12, tipo_memoria: "GDDR7", tdp_w: 250, largo_mm: 300 },
+    tags: ["gpu", "oferta"],
+  },
+  {
+    slug: "rtx-4060-8gb",
+    nombre: "Tarjeta gráfica NVIDIA GeForce RTX 4060 8 GB",
+    descripcion: "Bajo consumo y DLSS 3 para Full HD.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "NVIDIA",
+    precio: 1_490_000, stock: 12, vendidos: 88,
+    imagen: "gpu",
+    specs: { componente: "Tarjeta gráfica", vram_gb: 8, tipo_memoria: "GDDR6", tdp_w: 115, largo_mm: 245 },
+    tags: ["gpu"],
+  },
+  {
+    slug: "radeon-rx-9070-16gb",
+    nombre: "Tarjeta gráfica AMD Radeon RX 9070 16 GB",
+    descripcion: "16 GB de VRAM y FSR 4 para 2K sin compromisos.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "AMD",
+    precio: 3_190_000, stock: 4, vendidos: 21, nuevo: true,
+    imagen: "gpu",
+    specs: { componente: "Tarjeta gráfica", vram_gb: 16, tipo_memoria: "GDDR6", tdp_w: 220, largo_mm: 290 },
+    tags: ["gpu"],
+  },
+  {
+    slug: "ryzen-7-7800x3d",
+    nombre: "Procesador AMD Ryzen 7 7800X3D · 8 núcleos · AM5",
+    descripcion: "Caché 3D V-Cache: de los procesadores más rápidos para jugar.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "AMD",
+    precio: 1_890_000, stock: 9, vendidos: 56,
+    imagen: "cpu",
+    specs: { componente: "Procesador", nucleos: 8, hilos: 16, socket: "AM5", tdp_w: 120, tiene_igpu: true },
+    tags: ["cpu"],
+  },
+  {
+    slug: "core-i5-14400f",
+    nombre: "Procesador Intel Core i5-14400F · 10 núcleos · LGA1700",
+    descripcion: "Gran relación precio-rendimiento para armar un PC gamer de gama media.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "Intel",
+    precio: 829_000, stock: 15, vendidos: 73,
+    imagen: "cpu",
+    specs: { componente: "Procesador", nucleos: 10, hilos: 16, socket: "LGA1700", tdp_w: 65, tiene_igpu: false },
+    tags: ["cpu"],
+  },
+  {
+    slug: "board-b650-atx",
+    nombre: "Board AM5 B650 ATX · DDR5 · WiFi 6",
+    descripcion: "Base AM5 con dos ranuras M.2 y WiFi integrado.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "Vektor",
+    precio: 899_000, stock: 8, vendidos: 30,
+    imagen: "board",
+    specs: { componente: "Board", socket: "AM5", tipo_ram: "DDR5", factor_forma: "ATX", slots_ram: 4, m2_slots: 2 },
+    tags: ["board"],
+  },
+  {
+    slug: "ram-32gb-ddr5-6000",
+    nombre: "Memoria RAM 32 GB (2×16) DDR5 6000 MHz CL30",
+    descripcion: "El punto ideal de velocidad para AM5.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "Vektor",
+    precio: 529_000, stock: 20, vendidos: 95,
+    imagen: "ram",
+    specs: { componente: "Memoria RAM", capacidad_gb: 32, tipo_ram: "DDR5", velocidad_mhz: 6000 },
+    tags: ["ram"],
+  },
+  {
+    slug: "ssd-nvme-2tb-gen4",
+    nombre: "Disco SSD NVMe M.2 2 TB PCIe 4.0",
+    descripcion: "Hasta 7.000 MB/s de lectura: los juegos cargan en segundos.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "Halcón",
+    precio: 619_000, anterior: 699_000, stock: 18, vendidos: 102,
+    imagen: "ssd",
+    specs: { componente: "Almacenamiento", capacidad_gb: 2000, interfaz: "PCIe 4.0 NVMe", lectura_mbs: 7000 },
+    tags: ["almacenamiento"],
+  },
+  {
+    slug: "fuente-850w-gold",
+    nombre: "Fuente de poder 850 W 80+ Gold modular ATX 3.1",
+    descripcion: "Conector 12V-2x6 nativo para tarjetas gráficas de nueva generación.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "Halcón",
+    precio: 589_000, stock: 10, vendidos: 44,
+    imagen: "psu",
+    specs: { componente: "Fuente de poder", potencia_w: 850, certificacion: "80+ Gold", modular: true },
+    tags: ["fuente"],
+  },
+  {
+    slug: "gabinete-atx-vidrio",
+    nombre: "Gabinete ATX vidrio templado · 4 ventiladores",
+    descripcion: "Flujo de aire frontal en malla y espacio para gráficas de hasta 380 mm.",
+    tipo: "componente", categoria: "pc-gaming", subcategoria: "componentes", marca: "Oriel",
+    precio: 379_000, stock: 1, vendidos: 37, nuevo: true,
+    imagen: "case",
+    specs: { componente: "Gabinete", formatos: "ATX, mATX, ITX", max_gpu_mm: 380, max_cooler_mm: 165 },
+    tags: ["gabinete"],
+  },
+
+  // ───────────── Monitores ─────────────
+  {
+    slug: "monitor-24-fhd-180hz",
+    nombre: "Monitor gamer 24\" Full HD IPS 180 Hz",
+    descripcion: "El monitor competitivo de entrada: 1 ms y colores precisos.",
+    tipo: "monitor", categoria: "monitores", subcategoria: "monitores", marca: "Kairo",
+    precio: 649_000, anterior: 749_000, stock: 14, vendidos: 120, destacado: true,
+    imagen: "monitor",
+    specs: { tamano_pulgadas: 24, resolucion: "1920×1080", hz: 180, panel: "IPS", tiempo_respuesta_ms: 1 },
+    tags: ["monitor", "competitivo"],
+  },
+  {
+    slug: "monitor-27-qhd-165hz",
+    nombre: "Monitor gamer 27\" QHD IPS 165 Hz",
+    descripcion: "2K nítido para jugar y trabajar en la misma pantalla.",
+    tipo: "monitor", categoria: "monitores", subcategoria: "monitores", marca: "Kairo",
+    precio: 1_190_000, stock: 9, vendidos: 84, destacado: true,
+    imagen: "monitor",
+    specs: { tamano_pulgadas: 27, resolucion: "2560×1440", hz: 165, panel: "IPS", tiempo_respuesta_ms: 1 },
+    tags: ["monitor"],
+  },
+  {
+    slug: "monitor-27-qhd-oled-240hz",
+    nombre: "Monitor gamer 27\" QHD OLED 240 Hz",
+    descripcion: "Negros perfectos y 0,03 ms de respuesta.",
+    tipo: "monitor", categoria: "monitores", subcategoria: "monitores", marca: "Nórdika",
+    precio: 3_290_000, stock: 3, vendidos: 26, nuevo: true, destacado: true,
+    imagen: "monitor",
+    specs: { tamano_pulgadas: 27, resolucion: "2560×1440", hz: 240, panel: "OLED", tiempo_respuesta_ms: 0.03 },
+    tags: ["monitor", "oled"],
+  },
+  {
+    slug: "monitor-34-ultrawide-165hz",
+    nombre: "Monitor curvo 34\" ultrawide WQHD VA 165 Hz",
+    descripcion: "Formato 21:9 para simuladores y productividad.",
+    tipo: "monitor", categoria: "monitores", subcategoria: "monitores", marca: "Nórdika",
+    precio: 1_890_000, stock: 5, vendidos: 33,
+    imagen: "monitor",
+    specs: { tamano_pulgadas: 34, resolucion: "3440×1440", hz: 165, panel: "VA", tiempo_respuesta_ms: 1 },
+    tags: ["monitor", "ultrawide"],
+  },
+  {
+    slug: "monitor-32-4k-144hz",
+    nombre: "Monitor gamer 32\" 4K IPS 144 Hz",
+    descripcion: "4K a 144 Hz con HDMI 2.1 para PC y consola.",
+    tipo: "monitor", categoria: "monitores", subcategoria: "monitores", marca: "Kairo",
+    precio: 2_490_000, stock: 0, vendidos: 18,
+    imagen: "monitor",
+    specs: { tamano_pulgadas: 32, resolucion: "3840×2160", hz: 144, panel: "IPS", tiempo_respuesta_ms: 1 },
+    tags: ["monitor", "4k"],
+  },
+
+  // ───────────── Periféricos ─────────────
+  {
+    slug: "teclado-mecanico-tkl",
+    nombre: "Teclado mecánico TKL switches lineales RGB",
+    descripcion: "Formato sin teclado numérico para dejar más espacio al mouse.",
+    tipo: "periferico", categoria: "perifericos", subcategoria: "teclados", marca: "Vektor",
+    precio: 249_000, anterior: 289_000, stock: 25, vendidos: 210,
+    imagen: "keyboard",
+    specs: { formato: "TKL", switches: "Lineales", conexion: "USB-C", rgb: true },
+    tags: ["teclado"],
+  },
+  {
+    slug: "teclado-65-inalambrico",
+    nombre: "Teclado mecánico 65 % inalámbrico hot-swap",
+    descripcion: "Tres modos de conexión y switches intercambiables sin soldar.",
+    tipo: "periferico", categoria: "perifericos", subcategoria: "teclados", marca: "Oriel",
+    precio: 389_000, stock: 11, vendidos: 96, nuevo: true,
+    imagen: "keyboard",
+    specs: { formato: "65 %", switches: "Táctiles", conexion: "2.4 GHz, Bluetooth, USB-C", rgb: true },
+    tags: ["teclado", "inalambrico"],
+  },
+  {
+    slug: "mouse-ultraligero-inalambrico",
+    nombre: "Mouse gamer inalámbrico ultraligero 59 g",
+    descripcion: "Sensor de 26.000 DPI y 70 horas de batería.",
+    tipo: "periferico", categoria: "perifericos", subcategoria: "mouse", marca: "Vektor",
+    precio: 299_000, stock: 30, vendidos: 245,
+    imagen: "mouse",
+    specs: { peso_g: 59, dpi: 26000, conexion: "2.4 GHz", bateria_h: 70 },
+    tags: ["mouse", "competitivo"],
+  },
+  {
+    slug: "mouse-ergonomico-rgb",
+    nombre: "Mouse gamer ergonómico RGB 8 botones",
+    descripcion: "Forma para mano derecha y botones laterales programables.",
+    tipo: "periferico", categoria: "perifericos", subcategoria: "mouse", marca: "Halcón",
+    precio: 139_000, stock: 40, vendidos: 180,
+    imagen: "mouse",
+    specs: { peso_g: 92, dpi: 16000, conexion: "USB", botones: 8 },
+    tags: ["mouse"],
+  },
+  {
+    slug: "audifonos-71-usb",
+    nombre: "Audífonos gamer 7.1 USB con micrófono desmontable",
+    descripcion: "Sonido envolvente para ubicar pasos y disparos.",
+    tipo: "periferico", categoria: "perifericos", subcategoria: "audifonos", marca: "Halcón",
+    precio: 219_000, stock: 22, vendidos: 160,
+    imagen: "headset",
+    specs: { conexion: "USB", sonido: "7.1 virtual", microfono: "Desmontable" },
+    tags: ["audifonos"],
+  },
+  {
+    slug: "audifonos-inalambricos-2-4",
+    nombre: "Audífonos gamer inalámbricos 2.4 GHz 40 h",
+    descripcion: "Sin cables y con 40 horas de batería.",
+    tipo: "periferico", categoria: "perifericos", subcategoria: "audifonos", marca: "Nórdika",
+    precio: 459_000, anterior: 529_000, stock: 4, vendidos: 77,
+    imagen: "headset",
+    specs: { conexion: "2.4 GHz, Bluetooth", bateria_h: 40, microfono: "Retráctil" },
+    tags: ["audifonos", "inalambrico"],
+  },
+  {
+    slug: "microfono-usb-cardioide",
+    nombre: "Micrófono USB cardioide para streaming",
+    descripcion: "Brazo de mesa, filtro antipop y monitoreo sin latencia.",
+    tipo: "periferico", categoria: "perifericos", subcategoria: "streaming", marca: "Oriel",
+    precio: 329_000, stock: 13, vendidos: 132,
+    imagen: "mic",
+    specs: { conexion: "USB-C", patron: "Cardioide", muestreo: "24 bit / 96 kHz" },
+    tags: ["streaming", "microfono"],
+  },
+  {
+    slug: "capturadora-4k-hdmi",
+    nombre: "Capturadora de video 4K60 HDMI USB",
+    descripcion: "Transmite tu consola a 1080p60 con passthrough 4K.",
+    tipo: "periferico", categoria: "perifericos", subcategoria: "streaming", marca: "Oriel",
+    precio: 589_000, stock: 6, vendidos: 58, nuevo: true,
+    imagen: "capture",
+    specs: { entrada: "HDMI 2.0", captura: "1080p60", passthrough: "4K60", conexion: "USB 3.0" },
+    tags: ["streaming", "capturadora"],
+  },
+  {
+    slug: "camara-web-1080p60",
+    nombre: "Cámara web 1080p 60 FPS con luz de relleno",
+    descripcion: "Imagen fluida para tu facecam.",
+    tipo: "periferico", categoria: "perifericos", subcategoria: "streaming", marca: "Kairo",
+    precio: 259_000, stock: 17, vendidos: 90,
+    imagen: "webcam",
+    specs: { resolucion: "1080p", fps: 60, enfoque: "Automático" },
+    tags: ["streaming", "camara"],
+  },
+
+  // ───────────── Gameroom ─────────────
+  {
+    slug: "silla-gamer-ergonomica",
+    nombre: "Silla gamer ergonómica con soporte lumbar ajustable",
+    descripcion: "Espaldar en malla transpirable para clima cálido y jornadas largas.",
+    tipo: "gameroom", categoria: "gameroom", subcategoria: "sillas", marca: "Nórdika",
+    precio: 989_000, anterior: 1_149_000, stock: 8, vendidos: 66, destacado: true,
+    imagen: "chair",
+    specs: { material: "Malla y espuma", reclinacion_grados: 135, carga_max_kg: 130, apoyabrazos: "4D" },
+    tags: ["silla"],
+  },
+  {
+    slug: "silla-gamer-reclinable",
+    nombre: "Silla gamer reclinable 180° con reposapiés",
+    descripcion: "Cuero sintético y cojines de cuello y lumbar.",
+    tipo: "gameroom", categoria: "gameroom", subcategoria: "sillas", marca: "Halcón",
+    precio: 699_000, stock: 12, vendidos: 140,
+    imagen: "chair",
+    specs: { material: "Cuero sintético", reclinacion_grados: 180, carga_max_kg: 120, apoyabrazos: "2D" },
+    tags: ["silla"],
+  },
+  {
+    slug: "escritorio-gamer-140",
+    nombre: "Escritorio gamer 140 × 60 cm superficie en fibra de carbono",
+    descripcion: "Bandeja para cables y soporte para audífonos.",
+    tipo: "gameroom", categoria: "gameroom", subcategoria: "escritorios", marca: "Oriel",
+    precio: 549_000, stock: 7, vendidos: 48,
+    imagen: "desk",
+    specs: { ancho_cm: 140, fondo_cm: 60, altura_regulable: false },
+    tags: ["escritorio"],
+  },
+  {
+    slug: "escritorio-elevable-electrico",
+    nombre: "Escritorio elevable eléctrico 160 × 75 cm doble motor",
+    descripcion: "Alterna entre sentado y de pie con cuatro alturas guardadas.",
+    tipo: "gameroom", categoria: "gameroom", subcategoria: "escritorios", marca: "Nórdika",
+    precio: 1_790_000, stock: 2, vendidos: 15, nuevo: true,
+    imagen: "desk",
+    specs: { ancho_cm: 160, fondo_cm: 75, altura_regulable: true, motores: 2 },
+    tags: ["escritorio"],
+  },
+  {
+    slug: "tira-led-rgb-5m",
+    nombre: "Tira LED RGB direccionable 5 m con app y sincronía musical",
+    descripcion: "Ilumina el cuarto y sincroniza los colores con tu música.",
+    tipo: "gameroom", categoria: "gameroom", subcategoria: "iluminacion", marca: "Kairo",
+    precio: 119_000, stock: 50, vendidos: 310,
+    imagen: "lights",
+    specs: { largo_m: 5, control: "App y Wi-Fi", sincronia_musica: true },
+    tags: ["iluminacion"],
+  },
+  {
+    slug: "lampara-barra-monitor",
+    nombre: "Lámpara de barra para monitor con luz trasera RGB",
+    descripcion: "Ilumina el escritorio sin reflejos en la pantalla.",
+    tipo: "gameroom", categoria: "gameroom", subcategoria: "iluminacion", marca: "Kairo",
+    precio: 229_000, stock: 19, vendidos: 85, nuevo: true,
+    imagen: "lights",
+    specs: { temperatura_color: "2700–6500 K", luz_trasera: "RGB", alimentacion: "USB-C" },
+    tags: ["iluminacion", "streaming"],
+  },
+];
+
+export const mockProducts: Product[] = seeds.map(make);
