@@ -30,12 +30,17 @@ Si cambias el catálogo de ejemplo, regenera el seed con `npm run db:seed:genera
 ## 4. Comprobar
 Reinicia `npm run dev`. El home debe mostrar los mismos productos, ahora leídos de Supabase.
 
-## 5. Volverte administrador (para la Fase 4)
-Después de registrarte en la tienda (Fase 6a) o creando el usuario en **Authentication → Users**, ejecuta en el SQL Editor:
+## 5. Crear tu cuenta de administrador
+1. **Authentication → Users → Add user → Create new user**: tu correo y una contraseña fuerte (guárdala en tu gestor). Marca **Auto Confirm User**.
+2. En el **SQL Editor**, dale el rol de admin:
 
 ```sql
 update public.profiles set es_admin = true where id = (select id from auth.users where email = 'TU_CORREO');
 ```
+
+3. Entra a `/admin` (en local: http://localhost:3000/admin) con ese correo y contraseña.
+
+Una cuenta sin `es_admin` que intente entrar a `/admin` ve una página 404.
 
 ## Qué protege la base de datos (RLS)
 - Cualquiera puede **leer** el catálogo activo y las reseñas aprobadas.
