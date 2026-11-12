@@ -66,6 +66,9 @@ for (const p of mockProducts) {
       `) on conflict (slug) do nothing;`,
   );
   const pid = `(select id from public.products where slug = ${q(p.slug)})`;
+  // Idempotente: si el seed se ejecuta dos veces, las filas hijas no se duplican
+  out.push(`delete from public.product_images where product_id = ${pid};`);
+  out.push(`delete from public.pc_benchmarks where product_id = ${pid};`);
   p.imagenes.forEach((img, i) => {
     out.push(`insert into public.product_images (product_id, url, alt, orden) values (${pid}, ${q(img.url)}, ${q(img.alt)}, ${i});`);
   });
