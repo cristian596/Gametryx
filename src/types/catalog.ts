@@ -31,7 +31,12 @@ export type Product = {
   masVendido: number;
   imagenes: ProductImage[];
   fps?: FpsEstimate[];
+  /** Atributos del armador (solo componentes) */
+  compat?: CompatAttrs;
 };
+
+export type { CompatAttrs } from "@/lib/compat";
+import type { CompatAttrs } from "@/lib/compat";
 
 export type Category = {
   slug: CategorySlug;

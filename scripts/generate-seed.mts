@@ -87,6 +87,7 @@ for (const p of mockProducts) {
   if (typeof s.potencia_w === "number") compat.potencia_w = String(s.potencia_w);
   if (typeof s.factor_forma === "string") compat.factor_forma = q(s.factor_forma);
   if (typeof s.largo_mm === "number") compat.largo_mm = String(s.largo_mm);
+  if (typeof s.alto_cooler_mm === "number") compat.alto_cooler_mm = String(s.alto_cooler_mm);
   if (typeof s.max_gpu_mm === "number") compat.max_gpu_mm = String(s.max_gpu_mm);
   if (typeof s.max_cooler_mm === "number") compat.max_cooler_mm = String(s.max_cooler_mm);
   if (typeof s.slots_ram === "number") compat.slots_ram = String(s.slots_ram);

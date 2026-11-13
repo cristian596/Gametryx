@@ -1,4 +1,5 @@
 import { createPublicClient } from "@/lib/supabase/public";
+import { compatFromSpecs, type CompatAttrs } from "@/lib/compat";
 import type { CategorySlug, FpsEstimate, Product, SpecValue } from "@/types/catalog";
 
 const ROOT_SLUGS: CategorySlug[] = ["pc-gaming", "gameroom", "monitores", "perifericos"];
@@ -22,6 +23,7 @@ type ProductRow = {
   brand: { nombre: string } | null;
   images: { url: string; alt: string; orden: number }[];
   benchmarks: { juego: string; resolucion: FpsEstimate["resolucion"]; fps_estimado: number; orden: number }[];
+  compat?: (CompatAttrs & { product_id?: string }) | (CompatAttrs & { product_id?: string })[] | null;
 };
 
 /**
@@ -34,7 +36,8 @@ const SELECT = `
   category:categoria_id ( slug, parent:parent_id ( slug ) ),
   brand:marca_id ( nombre ),
   images:product_images ( url, alt, orden ),
-  benchmarks:pc_benchmarks ( juego, resolucion, fps_estimado, orden )
+  benchmarks:pc_benchmarks ( juego, resolucion, fps_estimado, orden ),
+  compat:compat_attrs ( socket, tipo_ram, tdp_w, potencia_w, factor_forma, formatos_soportados, largo_mm, alto_cooler_mm, max_gpu_mm, max_cooler_mm, tiene_igpu )
 `;
 
 /** Convierte una fila de Supabase al tipo Product que usa la interfaz. */
@@ -70,6 +73,7 @@ export function mapProductRow(row: ProductRow): Product | null {
           .sort((a, b) => a.orden - b.orden)
           .map((b) => ({ juego: b.juego, resolucion: b.resolucion, fps: b.fps_estimado }))
       : undefined,
+    compat: row.tipo === "componente" ? mergeCompat(row) : undefined,
   };
 }
 
@@ -79,4 +83,16 @@ export async function fetchSupabaseProducts(): Promise<Product[]> {
   const { data, error } = await supabase.from("products").select(SELECT).eq("activo", true).limit(2000);
   if (error) throw new Error(`No se pudo leer el catálogo de Supabase: ${error.message}`);
   return (data as unknown as ProductRow[]).map(mapProductRow).filter((p): p is Product => p !== null);
+}
+
+/** compat_attrs (lo que edita el admin) manda; lo que falte se toma de las specs. */
+function mergeCompat(row: ProductRow): CompatAttrs {
+  const fromSpecs = compatFromSpecs(row.specs ?? {});
+  const attrs = Array.isArray(row.compat) ? row.compat[0] : row.compat;
+  if (!attrs) return fromSpecs;
+  const merged: CompatAttrs = { ...fromSpecs };
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k !== "product_id" && v != null) (merged as Record<string, unknown>)[k] = v;
+  }
+  return merged;
 }

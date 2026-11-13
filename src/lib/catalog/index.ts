@@ -6,6 +6,7 @@
  */
 import { cacheLife, cacheTag } from "next/cache";
 import { mockProducts } from "@/data/catalog.mock";
+import { compatFromSpecs } from "@/lib/compat";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import type { Product } from "@/types/catalog";
 import { applyQuery, type ProductQuery } from "./query";
@@ -29,7 +30,7 @@ async function loadCatalog(): Promise<Product[]> {
     warned = true;
     console.warn("[catalog] Supabase no está configurado: se muestra el catálogo de EJEMPLO.");
   }
-  return mockProducts;
+  return mockProducts.map((p) => (p.tipo === "componente" ? { ...p, compat: compatFromSpecs(p.specs) } : p));
 }
 
 export interface CatalogRepository {
