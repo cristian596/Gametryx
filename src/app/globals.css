@@ -206,6 +206,11 @@
   }
 }
 
+/* Páginas con barra inferior fija (armador): el botón de WhatsApp sube para no taparla */
+@media (max-width: 63.99rem) {
+  html[data-bottom-bar] .wa-float { bottom: calc(6rem + env(safe-area-inset-bottom)); }
+}
+
 /* Mientras el aviso de cookies está abierto en celular, el botón de WhatsApp se oculta */
 @media (max-width: 47.99rem) {
   html[data-cookie-banner="open"] .wa-float { display: none; }
