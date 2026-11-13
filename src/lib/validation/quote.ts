@@ -33,8 +33,13 @@ export const quoteSchema = z.object({
   }),
   mensaje: z.string().trim().max(1000, "Usa máximo 1.000 caracteres.").optional(),
   autorizacion: z.literal(true, { error: "Necesitamos tu autorización para contactarte." }),
-  /** Campo trampa: los humanos lo dejan vacío */
-  empresa: z.string().max(0).optional(),
+  /** Campo trampa: los humanos lo dejan vacío. El servidor descarta en silencio si viene lleno. */
+  empresa: z.string().max(200).optional(),
+  /** Armado del armador ("cpu:slug,board:slug"); el servidor lo vuelve a leer del catálogo */
+  armado: z.string().max(600).optional(),
 });
+
+/** Versión de la política de datos aceptada (se guarda con cada autorización). Actualizar al publicar la definitiva. */
+export const PRIVACY_POLICY_VERSION = "2026-11-borrador";
 
 export type QuoteInput = z.infer<typeof quoteSchema>;
