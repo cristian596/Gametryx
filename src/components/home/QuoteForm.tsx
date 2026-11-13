@@ -20,12 +20,15 @@ function loadQuoteModule() {
 }
 
 /**
- * Formulario de cotización. Hasta la Fase 5 (API /api/quotes) envía la solicitud por WhatsApp
- * con el mensaje ya escrito, así funciona desde hoy.
+ * Formulario de cotización: se guarda en la base de datos (/api/quotes) y un asesor responde por WhatsApp.
+ * Si la API no está disponible (sin Supabase o sin conexión), deja el mensaje listo en WhatsApp.
+ * Con `armado` se adjunta el PC del armador; el servidor relee piezas y precios del catálogo.
  */
-export function QuoteForm() {
+export function QuoteForm({ armado, defaultInteres }: { armado?: string; defaultInteres?: string } = {}) {
   const [errors, setErrors] = useState<Errors>({});
-  const [sentUrl, setSentUrl] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
+  const [done, setDone] = useState<{ kind: "saved"; phone: string; url: string } | { kind: "whatsapp"; url: string } | null>(null);
+  const [sending, setSending] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const consentId = useId();
 
@@ -37,8 +40,7 @@ export function QuoteForm() {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    // Si zod ya estaba cargado, todo ocurre en el mismo clic y WhatsApp se abre directo
-    const sync = loaded.current !== null;
+    setFormError(null);
     const { quoteSchema } = loaded.current ?? (loaded.current = await loadQuoteModule());
     const fd = new FormData(form);
     const raw = {
@@ -50,6 +52,7 @@ export function QuoteForm() {
       mensaje: String(fd.get("mensaje") ?? ""),
       autorizacion: fd.get("autorizacion") === "on",
       empresa: String(fd.get("empresa") ?? ""),
+      armado: armado || undefined,
     };
     const parsed = quoteSchema.safeParse(raw);
     if (!parsed.success) {
@@ -72,35 +75,66 @@ export function QuoteForm() {
       `Hola, soy ${d.nombre} y quiero una cotización.`,
       `Busco: ${interes}.`,
       `Presupuesto: ${presupuesto}.`,
+      armado ? "Te envié mi armado desde el armador de VOLTA." : null,
       d.mensaje ? `Detalles: ${d.mensaje}` : null,
       `Mi número: ${d.telefono}${d.correo ? ` · Correo: ${d.correo}` : ""}`,
     ]
       .filter(Boolean)
       .join("\n");
     const url = whatsappUrl(text);
-    // Fuera del gesto del usuario el navegador bloquearía la ventana: entonces queda el botón "Abrir WhatsApp"
-    if (sync) window.open(url, "_blank", "noopener,noreferrer");
-    setSentUrl(url);
+
+    setSending(true);
+    try {
+      const res = await fetch("/api/quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(raw),
+      });
+      const json = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string; field?: string };
+      if (res.ok && json.ok) {
+        setDone({ kind: "saved", phone: d.telefono, url });
+      } else if (res.status === 503) {
+        setDone({ kind: "whatsapp", url });
+      } else {
+        if (json.field) setErrors({ [json.field]: json.error });
+        setFormError(json.error ?? "No pudimos enviar tu cotización. Intenta de nuevo.");
+      }
+    } catch {
+      // Sin conexión con el servidor: el mensaje queda listo para WhatsApp
+      setDone({ kind: "whatsapp", url });
+    } finally {
+      setSending(false);
+    }
   }
 
-  if (sentUrl) {
+  if (done) {
     return (
       <div role="status" className="flex animate-rise-in flex-col items-start gap-4 rounded-lg bg-surface p-6 sm:p-8">
         <CheckCircle2 aria-hidden className="size-10 text-success" />
-        <h3 className="text-2xl font-semibold">Tu cotización está lista para enviar</h3>
-        <p className="text-base leading-relaxed">
-          Dejamos tu mensaje escrito en WhatsApp. Si no se abrió solo, toca el botón y luego enviar.
-        </p>
+        {done.kind === "saved" ? (
+          <>
+            <h3 className="text-2xl font-semibold">Recibimos tu cotización</h3>
+            <p className="text-base leading-relaxed">
+              Un asesor te escribe por WhatsApp al <span className="price">{done.phone}</span> en horario de atención. Si
+              prefieres, escríbenos tú ahora.
+            </p>
+          </>
+        ) : (
+          <>
+            <h3 className="text-2xl font-semibold">Tu cotización está lista para enviar</h3>
+            <p className="text-base leading-relaxed">Toca el botón y luego enviar: el mensaje ya está escrito en WhatsApp.</p>
+          </>
+        )}
         <div className="flex flex-wrap gap-3">
           <a
-            href={sentUrl}
+            href={done.url}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex h-11 items-center rounded-sm bg-primary px-5 font-semibold text-on-primary hover:bg-primary-hover"
           >
-            Abrir WhatsApp
+            {done.kind === "saved" ? "Escribir por WhatsApp" : "Abrir WhatsApp"}
           </a>
-          <Button variant="secondary" onClick={() => setSentUrl(null)}>
+          <Button variant="secondary" onClick={() => setDone(null)}>
             Hacer otra cotización
           </Button>
         </div>
@@ -139,7 +173,7 @@ export function QuoteForm() {
           options={[...quoteInterests]}
           required
           error={errors.interes}
-          defaultValue=""
+          defaultValue={defaultInteres ?? ""}
         />
         <Select
           name="presupuesto"
@@ -190,8 +224,13 @@ export function QuoteForm() {
           </p>
         )}
       </div>
-      <Button type="submit" size="lg" className="self-start">
-        Enviar cotización por WhatsApp
+      {formError && (
+        <p role="alert" className="rounded-sm bg-danger/15 px-4 py-3 text-[15px]">
+          {formError}
+        </p>
+      )}
+      <Button type="submit" size="lg" className="self-start" loading={sending}>
+        Enviar cotización
       </Button>
     </form>
   );
