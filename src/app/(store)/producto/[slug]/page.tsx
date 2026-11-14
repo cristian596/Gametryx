@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/product/AddToCartButton";
+import { FavoriteButton } from "@/components/product/FavoriteButton";
 import { ProductCard } from "@/components/product/ProductCard";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -117,6 +118,7 @@ export default async function ProductPage({ params }: Props) {
             >
               Preguntar por WhatsApp
             </LinkButton>
+            <FavoriteButton productId={product.id} productName={product.nombre} variant="full" />
           </div>
 
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">

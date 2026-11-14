@@ -7,6 +7,7 @@ import { discountPercent } from "@/lib/format";
 import { cn } from "@/lib/cn";
 import type { Product } from "@/types/catalog";
 import { AddToCartButton } from "./AddToCartButton";
+import { FavoriteButton } from "./FavoriteButton";
 
 export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   const image = product.imagenes[0];
@@ -43,6 +44,8 @@ export function ProductCard({ product, priority = false }: { product: Product; p
           )}
         </div>
       </Link>
+      {/* z-10: por encima del enlace que cubre la tarjeta */}
+      <FavoriteButton productId={product.id} productName={product.nombre} className="absolute top-5 right-5 z-10" />
 
       <div className="flex flex-1 flex-col gap-3 px-1 pt-3">
         <p className="text-sm text-muted">{product.marca}</p>
