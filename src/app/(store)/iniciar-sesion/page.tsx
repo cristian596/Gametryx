@@ -33,6 +33,13 @@ async function SignInWithParams({ searchParams }: { searchParams: Props["searchP
           contraseña, pide un enlace nuevo.
         </FormAlert>
       )}
+      {sp.error === "navegador" && (
+        <FormAlert>
+          Abriste el enlace en un navegador distinto al que usaste para pedirlo. Pide uno nuevo en «¿Olvidaste tu
+          contraseña?» y ábrelo en este mismo navegador.
+        </FormAlert>
+      )}
+      {sp.aviso === "confirmado" && <FormAlert tone="success">Tu correo quedó confirmado. Ya puedes iniciar sesión.</FormAlert>}
       <SignInForm next={next || undefined} />
     </div>
   );
