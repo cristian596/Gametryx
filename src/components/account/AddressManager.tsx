@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/Select";
 import { departamentos } from "@/data/colombia";
 import { deleteAddress, saveAddress, setMainAddress } from "@/lib/account/account-actions";
 import type { FormState } from "@/lib/account/form-state";
+import { formatPhone } from "@/lib/format";
 import { FormAlert } from "./FormAlert";
 import { useFormAction } from "./useFormAction";
 
@@ -33,27 +34,41 @@ export function AddressManager({ addresses }: { addresses: Address[] }) {
   const [notice, setNotice] = useState<string | null>(null);
   const editing = mode && mode !== "new" ? addresses.find((a) => a.id === mode) : undefined;
 
+  // Al volver a la lista (guardar, cancelar, eliminar…) el foco va a la lista: el teclado y el
+  // lector de pantalla no se pierden y la página no queda desplazada al footer
+  const listRef = useRef<HTMLDivElement>(null);
+  const focusList = useRef(false);
+  useEffect(() => {
+    if (mode === null && focusList.current) {
+      focusList.current = false;
+      listRef.current?.focus();
+    }
+  }, [mode, notice]);
+  const backToList = (msg: string | null) => {
+    focusList.current = true;
+    setMode(null);
+    setNotice(msg);
+  };
+
   if (mode) {
     return (
       <AddressForm
         key={mode}
         address={editing}
         isFirst={addresses.length === 0}
-        onCancel={addresses.length > 0 ? () => setMode(null) : undefined}
-        onSaved={(ok) => {
-          setMode(null);
-          setNotice(ok === "updated" ? "Guardamos los cambios." : "Agregamos la dirección.");
-        }}
+        onCancel={addresses.length > 0 ? () => backToList(null) : undefined}
+        onSaved={(ok) => backToList(ok === "updated" ? "Guardamos los cambios." : "Agregamos la dirección.")}
       />
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={listRef} tabIndex={-1} className="flex scroll-mt-28 flex-col gap-4 outline-none">
       {notice && <FormAlert tone="success">{notice}</FormAlert>}
-      <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      {addresses.length === 0 && <p className="text-[15px] text-muted">No tienes direcciones guardadas.</p>}
+      <ul className="grid grid-cols-1 gap-3 empty:hidden md:grid-cols-2">
         {addresses.map((a) => (
-          <AddressCard key={a.id} address={a} onEdit={() => setMode(a.id)} onNotice={setNotice} />
+          <AddressCard key={a.id} address={a} onEdit={() => setMode(a.id)} onNotice={backToList} />
         ))}
       </ul>
       {addresses.length < MAX ? (
@@ -102,7 +117,7 @@ function AddressCard({
         <span>
           {a.ciudad}, {a.departamento}
         </span>
-        <span className="text-muted">{a.telefono}</span>
+        <span className="text-muted">{formatPhone(a.telefono)}</span>
       </address>
       {error && <FormAlert>{error}</FormAlert>}
       <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1 pt-1">
@@ -112,7 +127,8 @@ function AddressCard({
             <Button size="sm" variant="danger" loading={pending} onClick={() => run(() => deleteAddress(a.id), "Eliminamos la dirección.")}>
               Sí, eliminar
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => setConfirming(false)} disabled={pending}>
+            {/* El botón "Eliminar" desaparece al confirmar: el foco pasa a la opción segura */}
+            <Button size="sm" variant="ghost" onClick={() => setConfirming(false)} disabled={pending} autoFocus>
               Cancelar
             </Button>
           </div>
