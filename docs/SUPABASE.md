@@ -48,17 +48,21 @@ Una cuenta sin `es_admin` que intente entrar a `/admin` ve una página 404.
    - **Redirect URLs**: agrega `http://localhost:3000/**` y, al publicar, `https://TU-DOMINIO/**` (y la URL de Vercel si la usas).
 2. **Authentication → Sign In / Providers → Email**: deja activo **Confirm email** y **Secure email change**.
    En **Password** pon la longitud mínima en 8 (la tienda ya exige letras y números).
-3. **Authentication → Emails → Templates** (recomendado): cambia el enlace de estas plantillas para que funcionen
+3. **Authentication → Emails → Templates** (hacerlo junto con el paso 4: Supabase solo deja editar las plantillas
+   después de configurar un SMTP propio). Cambia el enlace de estas plantillas para que funcionen
    aunque el cliente abra el correo en otro navegador o en el celular:
 
    | Plantilla | Enlace |
    |---|---|
    | Confirm signup | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/cuenta` |
    | Reset password | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery` |
-   | Change email address | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change&next=/cuenta/datos?aviso=correo` |
+   | Change email address | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change&next=/cuenta/datos%3Faviso%3Dcorreo` |
 
-   Si no las cambias, los enlaces por defecto también funcionan, pero solo en el mismo navegador donde se pidieron.
-4. **Correo**: el servidor de correo incluido en Supabase solo envía unos pocos correos por hora y es para pruebas.
+   Mientras no las cambies, los enlaces por defecto funcionan, pero solo en el mismo navegador donde se pidieron
+   (si el de registro se abre en otro, la cuenta igual queda confirmada y el cliente entra con su contraseña).
+   En el campo de la plantilla, `?aviso=correo` dentro de `next` va como `%3Faviso%3Dcorreo`.
+4. **Correo**: el servidor de correo incluido en Supabase es solo para pruebas: envía unos pocos correos por hora
+   y únicamente a los correos de los miembros del equipo del proyecto.
    Antes de lanzar, configura un **SMTP propio** (Authentication → Emails → SMTP Settings), por ejemplo con Resend.
    Ver `docs/PENDIENTES-LANZAMIENTO.md`.
 
