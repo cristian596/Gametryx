@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { allowRequest, clientKey } from "@/lib/auth/rate-limit";
+import { safeNext } from "@/lib/auth/safe-next";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /** No se devuelve el correo en el estado: Next lo escribe en los logs de desarrollo. El campo conserva lo escrito. */
@@ -14,10 +15,6 @@ const loginSchema = z.object({
   next: z.string().optional(),
 });
 
-/** Solo rutas internas del admin: evita redirecciones abiertas a otros sitios. */
-function safeNext(next?: string) {
-  return next && next.startsWith("/admin") && !next.startsWith("//") ? next : "/admin/productos";
-}
 
 export async function adminSignIn(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const parsed = loginSchema.safeParse({
@@ -40,7 +37,8 @@ export async function adminSignIn(_prev: LoginState, formData: FormData): Promis
   // Mismo mensaje para correo o contraseña incorrectos: no revela qué cuentas existen
   if (error) return { error: "El correo o la contraseña no coinciden." };
 
-  redirect(safeNext(parsed.data.next));
+  // Solo rutas internas del admin: evita redirecciones abiertas a otros sitios
+  redirect(safeNext(parsed.data.next, "/admin/productos", "/admin"));
 }
 
 export async function adminSignOut() {
