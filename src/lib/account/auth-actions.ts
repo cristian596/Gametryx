@@ -114,8 +114,14 @@ export async function requestPasswordReset(_prev: FormState, formData: FormData)
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: confirmUrl("/cuenta/nueva-contrasena"),
   });
-  if (error) console.error("[recuperar]", error.code ?? error.status, error.message);
-  // Siempre la misma respuesta: no revela si el correo tiene cuenta
+  if (error) {
+    console.error("[recuperar]", error.code ?? error.status, error.message);
+    // El límite de envío de Supabase es de todo el proyecto: decirlo no revela si la cuenta existe
+    if (error.status === 429 || error.code === "over_email_send_rate_limit") {
+      return { error: "No pudimos enviar el correo en este momento. Inténtalo de nuevo en unos minutos." };
+    }
+  }
+  // Sin error de envío, siempre la misma respuesta: no revela si el correo tiene cuenta
   return { ok: "sent" };
 }
 
