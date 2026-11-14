@@ -42,6 +42,26 @@ update public.profiles set es_admin = true where id = (select id from auth.users
 
 Una cuenta sin `es_admin` que intente entrar a `/admin` ve una página 404.
 
+## 6. Cuentas de clientes (registro y recuperar contraseña)
+1. **Authentication → URL Configuration**
+   - **Site URL**: la URL pública (en local `http://localhost:3000`; en producción el dominio).
+   - **Redirect URLs**: agrega `http://localhost:3000/**` y, al publicar, `https://TU-DOMINIO/**` (y la URL de Vercel si la usas).
+2. **Authentication → Sign In / Providers → Email**: deja activo **Confirm email** y **Secure email change**.
+   En **Password** pon la longitud mínima en 8 (la tienda ya exige letras y números).
+3. **Authentication → Emails → Templates** (recomendado): cambia el enlace de estas plantillas para que funcionen
+   aunque el cliente abra el correo en otro navegador o en el celular:
+
+   | Plantilla | Enlace |
+   |---|---|
+   | Confirm signup | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/cuenta` |
+   | Reset password | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery` |
+   | Change email address | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change&next=/cuenta/datos?aviso=correo` |
+
+   Si no las cambias, los enlaces por defecto también funcionan, pero solo en el mismo navegador donde se pidieron.
+4. **Correo**: el servidor de correo incluido en Supabase solo envía unos pocos correos por hora y es para pruebas.
+   Antes de lanzar, configura un **SMTP propio** (Authentication → Emails → SMTP Settings), por ejemplo con Resend.
+   Ver `docs/PENDIENTES-LANZAMIENTO.md`.
+
 ## Qué protege la base de datos (RLS)
 - Cualquiera puede **leer** el catálogo activo y las reseñas aprobadas.
 - Cada usuario solo ve **sus** pedidos, direcciones, favoritos y perfil, y no puede darse permisos de admin.
