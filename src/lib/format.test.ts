@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { discountPercent, formatCOP, remainingForFreeShipping } from "./format";
+import { discountPercent, formatCOP, remainingForFreeShipping, formatPhone } from "./format";
 
 describe("formatCOP", () => {
   it("agrupa miles con punto y usa espacio de no separación", () => {
@@ -31,5 +31,12 @@ describe("remainingForFreeShipping", () => {
   it("nunca es negativo", () => {
     expect(remainingForFreeShipping(320_000, 500_000)).toBe(180_000);
     expect(remainingForFreeShipping(800_000, 500_000)).toBe(0);
+  });
+});
+
+describe("formatPhone", () => {
+  it("agrupa 10 dígitos y deja igual lo demás", () => {
+    expect(formatPhone("3001234567")).toBe("300 123 4567");
+    expect(formatPhone("12345")).toBe("12345");
   });
 });

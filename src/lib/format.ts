@@ -21,3 +21,9 @@ export function discountPercent(price: number, previousPrice?: number | null) {
 export function remainingForFreeShipping(subtotal: number, threshold: number) {
   return Math.max(0, threshold - subtotal);
 }
+
+/** Celular o fijo colombiano de 10 dígitos para leer: "3001234567" → "300 123 4567". */
+export function formatPhone(phone: string) {
+  const d = phone.replace(/\D/g, "");
+  return d.length === 10 ? `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}` : phone;
+}
