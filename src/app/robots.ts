@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       // Solo rutas privadas o técnicas
-      disallow: ["/api/", "/admin", "/cuenta", "/carrito", "/checkout", "/iniciar-sesion", "/registro"],
+      disallow: ["/api/", "/admin", "/cuenta", "/carrito", "/checkout", "/iniciar-sesion", "/registro", "/recuperar-contrasena", "/auth/"],
     },
     sitemap: absoluteUrl("/sitemap.xml"),
   };

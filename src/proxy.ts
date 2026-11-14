@@ -2,9 +2,9 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * Refresca la sesión de Supabase (cookies) y hace una comprobación OPTIMISTA en /admin:
- * sin sesión → a la página de ingreso. La autorización real (¿es admin?) se hace en el servidor,
- * junto a los datos, con requireAdmin() y la RLS.
+ * Refresca la sesión de Supabase (cookies) y hace una comprobación OPTIMISTA en /admin y /cuenta:
+ * sin sesión → a la página de ingreso que corresponda. La autorización real se hace en el servidor,
+ * junto a los datos, con requireAdmin() / requireUser() y la RLS.
  */
 export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -28,12 +28,15 @@ export async function proxy(request: NextRequest) {
   const signedIn = Boolean(data?.claims?.sub);
 
   const { pathname, search } = request.nextUrl;
-  const isLogin = pathname === "/admin/ingresar";
-  if (pathname.startsWith("/admin") && !isLogin && !signedIn) {
-    const to = request.nextUrl.clone();
-    to.pathname = "/admin/ingresar";
-    to.search = `?next=${encodeURIComponent(pathname + search)}`;
-    return NextResponse.redirect(to);
+  if (!signedIn) {
+    const isAdmin = pathname.startsWith("/admin");
+    const loginPath = isAdmin ? "/admin/ingresar" : "/iniciar-sesion";
+    if (pathname !== loginPath) {
+      const to = request.nextUrl.clone();
+      to.pathname = loginPath;
+      to.search = `?next=${encodeURIComponent(pathname + search)}`;
+      return NextResponse.redirect(to);
+    }
   }
 
   response.headers.set("X-Robots-Tag", "noindex, nofollow");

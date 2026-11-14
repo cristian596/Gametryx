@@ -1,13 +1,39 @@
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/layout/ComingSoon";
+import { Suspense } from "react";
+import { SignInForm } from "@/components/account/AuthForms";
+import { AuthShell } from "@/components/account/AuthShell";
+import { FormAlert } from "@/components/account/FormAlert";
+import { safeNext } from "@/lib/auth/safe-next";
 
-export const metadata: Metadata = { title: "Iniciar sesión", robots: { index: false } };
+export const metadata: Metadata = {
+  title: "Iniciar sesión",
+  robots: { index: false, follow: false },
+};
 
-export default function Page() {
+type Props = PageProps<"/iniciar-sesion">;
+
+export default function SignInPage({ searchParams }: Props) {
   return (
-    <ComingSoon
-      title="Iniciar sesión"
-      description="Entra para ver tus pedidos, tus favoritos y tus direcciones de envío."
-    />
+    <AuthShell title="Iniciar sesión" intro="Entra para ver tus pedidos, tus favoritos y tus direcciones de envío.">
+      <Suspense fallback={<SignInForm />}>
+        <SignInWithParams searchParams={searchParams} />
+      </Suspense>
+    </AuthShell>
+  );
+}
+
+async function SignInWithParams({ searchParams }: { searchParams: Props["searchParams"] }) {
+  const sp = await searchParams;
+  const next = safeNext(sp.next, "", "/");
+  return (
+    <div className="flex flex-col gap-5">
+      {sp.error === "enlace" && (
+        <FormAlert>
+          Ese enlace venció o ya se usó. Si estabas confirmando tu correo, intenta iniciar sesión; si querías recuperar tu
+          contraseña, pide un enlace nuevo.
+        </FormAlert>
+      )}
+      <SignInForm next={next || undefined} />
+    </div>
   );
 }
