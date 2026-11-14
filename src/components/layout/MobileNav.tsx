@@ -10,11 +10,13 @@ import { WhatsAppIcon } from "@/components/brand/SocialIcons";
 import { mainNav } from "@/config/navigation";
 import { site, whatsappUrl } from "@/config/site";
 import { cn } from "@/lib/cn";
+import { useHasSession } from "@/store/session";
 import { isActive } from "./NavLinks";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const signedIn = useHasSession();
 
   // Cierra el panel al navegar
   const [lastPath, setLastPath] = useState(pathname);
@@ -41,17 +43,23 @@ export function MobileNav() {
         title="Menú"
         variant="right"
         footer={
-          <div className="flex flex-col gap-3">
-            <LinkButton href="/iniciar-sesion" size="lg" className="w-full">
-              Iniciar sesión
+          signedIn ? (
+            <LinkButton href="/cuenta" size="lg" className="w-full">
+              Mi cuenta
             </LinkButton>
-            <p className="text-center text-sm text-muted">
-              ¿No tienes cuenta?{" "}
-              <Link href="/registro" className="font-semibold text-accent underline-offset-4 hover:underline">
-                Regístrate
-              </Link>
-            </p>
-          </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <LinkButton href="/iniciar-sesion" size="lg" className="w-full">
+                Iniciar sesión
+              </LinkButton>
+              <p className="text-center text-sm text-muted">
+                ¿No tienes cuenta?{" "}
+                <Link href="/registro" className="font-semibold text-accent underline-offset-4 hover:underline">
+                  Regístrate
+                </Link>
+              </p>
+            </div>
+          )
         }
       >
         <nav aria-label="Principal (móvil)">

@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { User } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { site } from "@/config/site";
 import { formatCOP } from "@/lib/format";
+import { AccountLink } from "./AccountLink";
 import { CartButton } from "./CartButton";
 import { MobileNav } from "./MobileNav";
 import { DesktopNavLinks } from "./NavLinks";
@@ -22,20 +22,7 @@ export function Navbar() {
           <DesktopNavLinks />
         </div>
         <div className="flex items-center gap-1">
-          <Link
-            href="/iniciar-sesion"
-            className="hidden h-11 items-center gap-2 whitespace-nowrap rounded-sm px-3 text-[15px] font-medium text-text transition-colors hover:bg-surface-2 sm:inline-flex lg:hidden xl:inline-flex"
-          >
-            <User aria-hidden className="size-5" />
-            <span>Iniciar sesión</span>
-          </Link>
-          <Link
-            href="/iniciar-sesion"
-            aria-label="Iniciar sesión"
-            className="grid size-11 place-items-center rounded-sm text-text transition-colors hover:bg-surface-2 sm:hidden lg:grid xl:hidden"
-          >
-            <User aria-hidden className="size-[22px]" />
-          </Link>
+          <AccountLink />
           <CartButton />
           <MobileNav />
         </div>
