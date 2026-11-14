@@ -58,6 +58,22 @@ function check(name, ok, detail = "") {
   check("anónimo no es admin", !r.error && r.data === false);
 }
 
+// ───────────── Códigos del correo: 3 intentos por código ─────────────
+{
+  const r = await anon.rpc("otp_attempt", { p_key: "otp:test:zz", p_max: 3 });
+  check("anónimo NO ejecuta otp_attempt", !!r.error, r.error?.code);
+  const key = "otp:test:check-db";
+  const start = await admin.rpc("otp_start", { p_key: key });
+  const tries = [];
+  for (let i = 0; i < 4; i++) tries.push((await admin.rpc("otp_attempt", { p_key: key, p_max: 3 })).data);
+  check(
+    "otp: 3 intentos y luego bloqueado",
+    !start.error && JSON.stringify(tries) === JSON.stringify([1, 2, 3, null]),
+    start.error ? start.error.message : `intentos ${JSON.stringify(tries)}`,
+  );
+  await admin.from("rate_limits").delete().eq("key", key);
+}
+
 // ───────────── confirmar_pago: última unidad ─────────────
 const { data: cat } = await admin.from("categories").select("id").eq("slug", "componentes").single();
 const { data: product, error: pErr } = await admin
