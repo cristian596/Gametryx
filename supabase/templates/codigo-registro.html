@@ -1,0 +1,18 @@
+<!-- Supabase → Authentication → Emails → Templates → "Confirm sign up"
+     Asunto: Tu código para activar tu cuenta VOLTA -->
+<div style="background:#0a0b0f;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;color:#f2f4f8">
+  <div style="max-width:480px;margin:0 auto;background:#14161d;border-radius:16px;padding:32px 28px">
+    <p style="margin:0 0 24px;font-size:22px;font-weight:bold;letter-spacing:2px">VOLT<span style="color:#c6ff3d">A</span></p>
+    <h1 style="margin:0 0 12px;font-size:22px">Activa tu cuenta</h1>
+    <p style="margin:0 0 24px;font-size:15px;line-height:1.5;color:#c9ced8">
+      Escribe este código en la página de registro para activar tu cuenta:
+    </p>
+    <p style="margin:0 0 24px;padding:16px;background:#1b1e27;border-radius:10px;text-align:center;font-family:'Courier New',monospace;font-size:34px;font-weight:bold;letter-spacing:8px;color:#c6ff3d">
+      {{ .Token }}
+    </p>
+    <p style="margin:0 0 8px;font-size:14px;line-height:1.5;color:#9aa3b2">Vence en 15 minutos. Tienes 3 intentos para escribirlo.</p>
+    <p style="margin:0;font-size:14px;line-height:1.5;color:#9aa3b2">
+      Si no creaste una cuenta en VOLTA, ignora este correo.
+    </p>
+  </div>
+</div>

@@ -23,7 +23,8 @@ En **SQL Editor → New query**, pega y ejecuta **en este orden** el contenido d
 1. `supabase/migrations/20261112000100_schema.sql`
 2. `supabase/migrations/20261112000200_rls.sql`
 3. `supabase/migrations/20261112000300_functions.sql`
-4. `supabase/seed.sql` (productos de ejemplo)
+4. `supabase/migrations/20261113000100_otp_attempts.sql`
+5. `supabase/seed.sql` (productos de ejemplo)
 
 Si cambias el catálogo de ejemplo, regenera el seed con `npm run db:seed:generate`.
 
@@ -48,23 +49,30 @@ Una cuenta sin `es_admin` que intente entrar a `/admin` ve una página 404.
    - **Redirect URLs**: agrega `http://localhost:3000/**` y, al publicar, `https://TU-DOMINIO/**` (y la URL de Vercel si la usas).
 2. **Authentication → Sign In / Providers → Email**: deja activo **Confirm email** y **Secure email change**.
    En **Password** pon la longitud mínima en 8 (la tienda ya exige letras y números).
-3. **Authentication → Emails → Templates** (hacerlo junto con el paso 4: Supabase solo deja editar las plantillas
-   después de configurar un SMTP propio). Cambia el enlace de estas plantillas para que funcionen
-   aunque el cliente abra el correo en otro navegador o en el celular:
+3. **Correo propio con Resend (SMTP)**: el correo incluido en Supabase solo envía unos pocos correos por hora,
+   únicamente a los miembros del equipo y sin poder editar las plantillas. Para que lleguen los códigos:
+   1. Crea una cuenta gratis en resend.com (3.000 correos al mes) y en **API Keys → Create API key** crea una
+      clave con permiso **Sending access**. Cópiala directo al punto 2; no la guardes en el código.
+   2. En Supabase: **Authentication → Emails → SMTP Settings → Enable custom SMTP**:
+      - **Sender email**: para pruebas `onboarding@resend.dev` (solo entrega a tu propio correo de Resend);
+        para lanzar, un correo de tu dominio verificado en Resend (por ejemplo `no-responder@TU-DOMINIO`).
+      - **Sender name**: `VOLTA`
+      - **Host** `smtp.resend.com` · **Port** `465` · **Username** `resend` · **Password**: la API key de Resend.
+   3. **Authentication → Rate Limits**: sube **Rate limit for sending emails** a 30 por hora (o lo que necesites).
+4. **Códigos de 6 dígitos** (registro y recuperar contraseña se hacen con código, sin enlaces):
+   1. **Authentication → Sign In / Providers → Email**: **Email OTP Expiration** en `900` segundos (15 minutos)
+      y **Email OTP Length** en `6`.
+   2. **Authentication → Emails → Templates**, pega el HTML de cada archivo (el asunto está en el comentario de arriba):
 
-   | Plantilla | Enlace |
-   |---|---|
-   | Confirm signup | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/cuenta` |
-   | Reset password | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery` |
-   | Change email address | `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change&next=/cuenta/datos%3Faviso%3Dcorreo` |
+      | Plantilla | Archivo |
+      |---|---|
+      | Confirm sign up | `supabase/templates/codigo-registro.html` |
+      | Reset password | `supabase/templates/codigo-recuperar.html` |
 
-   Mientras no las cambies, los enlaces por defecto funcionan, pero solo en el mismo navegador donde se pidieron
-   (si el de registro se abre en otro, la cuenta igual queda confirmada y el cliente entra con su contraseña).
-   En el campo de la plantilla, `?aviso=correo` dentro de `next` va como `%3Faviso%3Dcorreo`.
-4. **Correo**: el servidor de correo incluido en Supabase es solo para pruebas: envía unos pocos correos por hora
-   y únicamente a los correos de los miembros del equipo del proyecto.
-   Antes de lanzar, configura un **SMTP propio** (Authentication → Emails → SMTP Settings), por ejemplo con Resend.
-   Ver `docs/PENDIENTES-LANZAMIENTO.md`.
+   3. En el **SQL Editor** ejecuta `supabase/migrations/20261113000100_otp_attempts.sql` (cuenta los 3 intentos por código).
+5. **Change email address** (cambiar correo desde Mis datos sigue con enlace): en esa plantilla usa este enlace para
+   que funcione aunque se abra en otro navegador:
+   `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change&next=/cuenta/datos%3Faviso%3Dcorreo`
 
 ## Qué protege la base de datos (RLS)
 - Cualquiera puede **leer** el catálogo activo y las reseñas aprobadas.
