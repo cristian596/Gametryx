@@ -87,3 +87,12 @@ export function fieldErrors(error: z.ZodError) {
   }
   return out;
 }
+
+/** Código del correo (Supabase envía 6 dígitos por defecto; se aceptan hasta 10 por si se cambia la longitud). */
+export const codeSchema = z.object({
+  email,
+  token: z
+    .string()
+    .transform((v) => v.replace(/\s/g, ""))
+    .pipe(z.string().regex(/^\d{6,10}$/, "Escribe el código de 6 dígitos que te enviamos.")),
+});

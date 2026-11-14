@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { safeNext } from "@/lib/auth/safe-next";
-import { addressSchema, changePasswordSchema, passwordSchema, signUpSchema } from "./account";
+import { addressSchema, changePasswordSchema, codeSchema, passwordSchema, signUpSchema } from "./account";
 
 describe("safeNext", () => {
   it("acepta rutas internas", () => {
@@ -60,5 +60,16 @@ describe("direcciones", () => {
   });
   it("rechaza departamentos que no existen", () => {
     expect(addressSchema.safeParse({ ...ok, departamento: "Narnia" }).success).toBe(false);
+  });
+});
+
+describe("código del correo", () => {
+  it("acepta 6 dígitos aunque vengan con espacios", () => {
+    const r = codeSchema.safeParse({ email: "a@b.co", token: " 123 456 " });
+    expect(r.success && r.data.token).toBe("123456");
+  });
+  it("rechaza letras o códigos cortos", () => {
+    expect(codeSchema.safeParse({ email: "a@b.co", token: "12345" }).success).toBe(false);
+    expect(codeSchema.safeParse({ email: "a@b.co", token: "12a456" }).success).toBe(false);
   });
 });

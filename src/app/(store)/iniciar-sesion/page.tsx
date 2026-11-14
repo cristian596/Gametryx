@@ -30,13 +30,13 @@ async function SignInWithParams({ searchParams }: { searchParams: Props["searchP
       {sp.error === "enlace" && (
         <FormAlert>
           Ese enlace venció o ya se usó. Si estabas confirmando tu correo, intenta iniciar sesión; si querías recuperar tu
-          contraseña, pide un enlace nuevo.
+          contraseña, pide un código nuevo.
         </FormAlert>
       )}
       {sp.error === "navegador" && (
         <FormAlert>
-          Abriste el enlace en un navegador distinto al que usaste para pedirlo. Pide uno nuevo en «¿Olvidaste tu
-          contraseña?» y ábrelo en este mismo navegador.
+          Ese enlace ya no sirve. Entra a «¿Olvidaste tu contraseña?» y pide un código: lo escribes aquí mismo, sin abrir
+          enlaces.
         </FormAlert>
       )}
       {sp.aviso === "confirmado" && <FormAlert tone="success">Tu correo quedó confirmado. Ya puedes iniciar sesión.</FormAlert>}

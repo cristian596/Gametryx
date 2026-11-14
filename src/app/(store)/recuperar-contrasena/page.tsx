@@ -11,7 +11,7 @@ export default function ResetPasswordPage() {
   return (
     <AuthShell
       title="Recuperar contraseña"
-      intro="Escribe el correo de tu cuenta y te enviamos un enlace para crear una contraseña nueva."
+      intro="Escribe el correo de tu cuenta y te enviamos un código para crear una contraseña nueva."
     >
       <ResetPasswordForm />
     </AuthShell>
